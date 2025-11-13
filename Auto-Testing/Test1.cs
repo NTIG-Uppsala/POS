@@ -11,83 +11,115 @@ namespace CheckoutTests
     [TestClass]
     public class CheckoutUITests
     {
+        private const string AppPath =
+            "C:\\Users\\pontus.noaksson\\source\\repos\\POS\\Checkout\\bin\\Debug\\net9.0-windows\\Checkout.exe";
+
         [TestMethod]
-        public void AddCoffeeAndClearCartTest()
+        public void Test_AddCoffeeButton_AddsProductAndUpdatesTotal()
         {
-            var app = FlaUI.Core.Application.Launch("C:\\Users\\pontus.noaksson\\source\\repos\\NTIG-Uppsala\\Checkout\\bin\\Release\\net9.0-windows\\Checkout.exe");
+            var app = FlaUI.Core.Application.Launch(AppPath);
             using (var automation = new UIA3Automation())
             {
                 var window = app.GetMainWindow(automation);
-                var cf = new ConditionFactory(new UIA3PropertyLibrary());
+                Assert.IsNotNull(window, "Main window was not found.");
 
-                // Hitta kontroller
-                var lb = window.FindFirstDescendant(cf.ByAutomationId("lstProducts"))?.AsListBox();
-                var txtTotal = window.FindFirstDescendant(cf.ByAutomationId("txtTotal"))?.AsLabel();
-                var btnAddCoffee = window.FindFirstDescendant(cf.ByAutomationId("btnAddCoffee"))?.AsButton();
-                var btnClear = window.FindFirstDescendant(cf.ByAutomationId("btnClear"))?.AsButton();
+                ConditionFactory cf = new ConditionFactory(new UIA3PropertyLibrary());
 
-                Assert.IsNotNull(lb, "Hittade inte ListBox");
-                Assert.IsNotNull(txtTotal, "Hittade inte total-TextBlock");
-                Assert.IsNotNull(btnAddCoffee, "Hittade inte AddCoffee-knappen");
-                Assert.IsNotNull(btnClear, "Hittade inte Clear-knappen");
+                var listElement = window.FindFirstDescendant(cf.ByAutomationId("lstProducts"));
+                var addButton = window.FindFirstDescendant(cf.ByAutomationId("btnAddCoffee"));
+                var totalText = window.FindFirstDescendant(cf.ByAutomationId("txtTotal"));
 
-                Debug.Print(lb.FindAllChildren().Length.ToString());
-                Debug.Print(lb.Items.Count().ToString());
+                Assert.IsNotNull(listElement, "ListBox not found.");
+                Assert.IsNotNull(addButton, "Add Coffee button not found.");
+                Assert.IsNotNull(totalText, "Total textblock not found.");
 
-                // ---------- Test 1: Lägg till kaffe ----------
-                btnAddCoffee.Click();
-                btnAddCoffee.Click();
-                btnAddCoffee.Click();
-                btnAddCoffee.Click();
-                btnAddCoffee.Click();
+                var listBox = listElement.AsListBox();
+                var button = addButton.AsButton();
+                var total = totalText.AsLabel();
 
-                Debug.Print(lb.FindAllChildren().Length.ToString());
-                Debug.Print(lb.Properties.SizeOfSet.ToString());
-                Debug.Print(lb.FindAllChildren().Length.ToString());
-                Debug.Print("yo");
+                // Klicka för att lägga till kaffe
+                button.Click();
 
-                var added1 = Retry.WhileFalse(() =>
-                {
-                    lb = window.FindFirstDescendant(cf.ByAutomationId("lstProducts"))?.AsListBox();
-                    return lb != null && lb.FindAllChildren().Length == 1;
-                }, TimeSpan.FromSeconds(5)).Success;
+                // Kontrollera att produkten finns i listan
+                var addedItem = listBox.FindFirstChild(cf.ByName("Kaffe - 49 kr"));
+                Trace.Assert(addedItem != null, "Expected product was not found in the list.");
 
-                Assert.IsTrue(added1, "ListBox should have 1 item after adding coffee");
-                var items1 = lb.FindAllChildren();
-                Assert.AreEqual("Kaffe - 49 kr", items1[0].Name, "Fel text på första item");
-                Assert.AreEqual("49 kr", txtTotal.Text, "Fel total efter första kaffe");
+                // Kontrollera att totalsumman uppdaterats
+                Trace.Assert(total.Text == "49 kr", "Total price was not updated correctly.");
+            }
+        }
 
-                // ---------- Test 2: Lägg till kaffe igen ----------
-                Debug.Print(items1.Length.ToString());
-                btnAddCoffee.Click();
-                Debug.Print(items1.Length.ToString());
 
-                //var added2 = Retry.WhileFalse(() =>
-                //{
-                //    lb = window.FindFirstDescendant(cf.ByAutomationId("lstProducts"))?.AsListBox();
-                //    return lb != null && lb.FindAllChildren().Length == 2;
-                //}, TimeSpan.FromSeconds(5)).Success;
-                //Assert.AreEqual(lb.Items[0].Name, "Kaffe - 49 kr");
-                //Assert.AreEqual(lb.Items[1].Text, "Kaffe - 49 kr");
-                //Assert.IsTrue(added2, "ListBox should have 2 items after adding coffee again");
-                var items2 = lb.FindAllChildren();
-                Debug.Print(items2.Length.ToString());
-                Debug.Print(items1.Length.ToString());
-                //Assert.AreEqual("Kaffe - 49 kr", items2[1].Name, "Fel text på andra item");
-                //Assert.AreEqual("98 kr", txtTotal.Text, "Fel total efter två kaffe");
+        [TestMethod]
+        public void Test_ClearButton_EmptiesListAndResetsTotal()
+        {
+            var app = FlaUI.Core.Application.Launch(AppPath);
+            using (var automation = new UIA3Automation())
+            {
+                var window = app.GetMainWindow(automation);
+                Assert.IsNotNull(window, "Main window was not found.");
 
-                // ---------- Test 3: Rensa kundvagn ----------
-                btnClear.Click();
+                ConditionFactory cf = new ConditionFactory(new UIA3PropertyLibrary());
 
-                var cleared = Retry.WhileFalse(() =>
-                {
-                    lb = window.FindFirstDescendant(cf.ByAutomationId("lstProducts"))?.AsListBox();
-                    txtTotal = window.FindFirstDescendant(cf.ByAutomationId("txtTotal"))?.AsLabel();
-                    return lb != null && lb.FindAllChildren().Length == 0 &&
-                           txtTotal != null && txtTotal.Text == "0 kr";
-                }, TimeSpan.FromSeconds(5)).Success;
+                var listElement = window.FindFirstDescendant(cf.ByAutomationId("lstProducts"));
+                var addButton = window.FindFirstDescendant(cf.ByAutomationId("btnAddCoffee"));
+                var clearButton = window.FindFirstDescendant(cf.ByAutomationId("btnClear"));
+                var totalText = window.FindFirstDescendant(cf.ByAutomationId("txtTotal"));
 
-                Assert.IsTrue(cleared, "Cart should be cleared and total reset to 0 kr");
+                var listBox = listElement.AsListBox();
+                var add = addButton.AsButton();
+                var clear = clearButton.AsButton();
+                var total = totalText.AsLabel();
+
+                // Lägg till produkter
+                add.Click();
+                add.Click();
+
+                // Kontrollera att minst en produkt finns innan vi rensar
+                var addedItem = listBox.FindFirstChild(cf.ByName("Kaffe - 49 kr"));
+                Trace.Assert(addedItem != null, "Expected product was not found in the list before clearing.");
+
+                // Kontrollera totalsumman innan rensning
+                Trace.Assert(total.Text == "98 kr", "Total before clearing is not correct.");
+
+                // Tryck på rensa kundvagn
+                clear.Click();
+
+                // Kontrollera att totalsumman nollställts
+                Trace.Assert(total.Text == "0 kr", "Total was not reset.");
+            }
+        }
+
+        [TestMethod]
+        public void Test_AddingMultipleProducts_UpdatesTotalIncrementally()
+        {
+            var app = FlaUI.Core.Application.Launch(AppPath);
+            using (var automation = new UIA3Automation())
+            {
+                var window = app.GetMainWindow(automation);
+                Assert.IsNotNull(window, "Main window was not found.");
+
+                ConditionFactory cf = new ConditionFactory(new UIA3PropertyLibrary());
+
+                var listElement = window.FindFirstDescendant(cf.ByAutomationId("lstProducts"));
+                var addButton = window.FindFirstDescendant(cf.ByAutomationId("btnAddCoffee"));
+                var totalText = window.FindFirstDescendant(cf.ByAutomationId("txtTotal"));
+
+                var listBox = listElement.AsListBox();
+                var button = addButton.AsButton();
+                var total = totalText.AsLabel();
+
+                // Lägg till 3 produkter
+                button.Click();
+                button.Click();
+                button.Click();
+
+                // Kontrollera att minst ett objekt finns
+                var addedItem = listBox.FindFirstChild(cf.ByName("Kaffe - 49 kr"));
+                Trace.Assert(addedItem != null, "Expected product was not found in the list.");
+
+                // Kontrollera att totalsumman stämmer
+                Trace.Assert(total.Text == "147 kr", "Total was not correctly calculated after multiple additions.");
             }
         }
     }

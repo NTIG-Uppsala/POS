@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.14.36623.8
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Checkout", "Checkout.csproj", "{2353F465-3202-491F-9E2E-A4EBAB07F99C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Checkout", "Checkout\Checkout.csproj", "{2353F465-3202-491F-9E2E-A4EBAB07F99C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auto-Testing", "..\Auto-Testing\Auto-Testing.csproj", "{0F8D4995-F5B2-FD1D-10A2-A36128045EDE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auto-Testing", "Auto-Testing\Auto-Testing.csproj", "{0F8D4995-F5B2-FD1D-10A2-A36128045EDE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
