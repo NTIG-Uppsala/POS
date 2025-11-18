@@ -11,8 +11,11 @@ namespace CheckoutTests
     [TestClass]
     public class CheckoutUITests
     {
-        private const string AppPath =
-            "C:\\Users\\pontus.noaksson\\source\\repos\\POS\\Checkout\\bin\\Debug\\net9.0-windows\\Checkout.exe";
+        private static readonly string AppPath =
+    System.IO.Path.Combine(
+        System.IO.Path.GetFullPath("../../../../Checkout/bin/Debug/net9.0-windows/"),
+        "Checkout.exe"
+    );
 
         [TestMethod]
         public void Test_AddCoffeeButton_AddsProductAndUpdatesTotal()
