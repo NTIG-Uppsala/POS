@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Checkout"
         mc:Ignorable="d"
-        Title="CheckOut" Height="220" Width="260">
+        Title="CheckOut" Height="440" Width="520">
     <Grid Margin="10">
 
         <Grid.RowDefinitions>
@@ -15,22 +15,27 @@
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="100" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <Label>Produkter</Label>
+        <Label>Varukorg</Label>
 
         <ListBox Grid.Row="1" x:Name="lstProducts"/>
 
-        <StackPanel Grid.Row="1" Grid.Column="1" Margin="5,0,0,0">
-            <Button x:Name="btnAddCoffee" 
-        Margin="0,0,0,5" Click="ButtonAddCoffee">Kaffe (49 kr)</Button>
-            <Button x:Name="btnClear" 
-        Click="ButtonClearCart">Rensa kundvagn</Button>
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Top" Grid.Row="1" Grid.Column="1" Margin="5,5,0,5">
+            <Button x:Name="btnFood" Click="ButtonFood" Content="Enkel Mat" Height="25px" Width="90px" Margin="0,0,5,0" Background="CornflowerBlue"/>
+            <Button x:Name="btnCandy" Click="ButtonCandy" Content="Godis" Height="25px" Width="90px" Background="SkyBlue"/>
+            <Button x:Name="btnTobacco" Click="ButtonTobacco" Content="Tobak" Height="25px" Width="90px" Margin="5,0,5,0" Background="LightBlue"/>
+            <Button x:Name="btnPaper" Click="ButtonPaper" Content="Tidningar" Height="25px" Width="90px" Background="LightSteelBlue"/>
         </StackPanel>
 
-        <StackPanel Grid.Row="2" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,5,0,0">
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Right" Grid.Row="1" Grid.Column="1" Margin="0,0,5,5">
+            <Button x:Name="btnPay" Click="ButtonPay" Background="Lime" Height="30px" Width="100px" Margin="0,0,5,0" Content="Betala"/>
+            <Button x:Name="btnClear" Click="ButtonClearCart" Background="Red" Height="30px" Width="100px" Content="Rensa"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="2" Grid.ColumnSpan="2" Orientation="Horizontal" Margin="0,5,0,0">
             <TextBlock Text="Total Pris:" VerticalAlignment="Center" FontWeight="Bold"/>
             <TextBlock x:Name="txtTotal" Text="0 kr" FontWeight="Bold" Margin="5,0,0,0"/>
         </StackPanel>

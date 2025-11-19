@@ -9,6 +9,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Xml.Linq;
+using System.Drawing;
 
 namespace Checkout
 {
@@ -21,11 +22,30 @@ namespace Checkout
             InitializeComponent();
         }
 
-        private void ButtonAddCoffee(object sender, RoutedEventArgs e)
+        private void ButtonFood(object sender, RoutedEventArgs e)
         {
-            string product = "Kaffe - 49 kr";
-            lstProducts.Items.Add(product);
-            totalSum += 49;
+
+        }
+
+        private void ButtonCandy(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void ButtonTobacco(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void ButtonPaper(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void ButtonPay(object sender, RoutedEventArgs e)
+        {
+            lstProducts.Items.Clear();
+            totalSum = 0;
             UpdateTotal();
         }
 
