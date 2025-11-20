@@ -5,7 +5,13 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Checkout"
         mc:Ignorable="d"
-        Title="CheckOut" Height="440" Width="520">
+        FontSize="20"
+        Title="CheckOut" MinHeight="440" MinWidth="520">
+
+    <Window.LayoutTransform>
+        <ScaleTransform ScaleX="1.5" ScaleY="1.5"/>
+    </Window.LayoutTransform>
+
     <Grid Margin="10">
 
         <Grid.RowDefinitions>
@@ -15,7 +21,7 @@
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="100" />
+            <ColumnDefinition Width="200" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
@@ -23,16 +29,17 @@
 
         <ListBox Grid.Row="1" x:Name="lstProducts"/>
 
+
         <StackPanel Orientation="Horizontal" VerticalAlignment="Top" Grid.Row="1" Grid.Column="1" Margin="5,5,0,5">
-            <Button x:Name="btnFood" Click="ButtonFood" Content="Enkel Mat" Height="25px" Width="90px" Margin="0,0,5,0" Background="CornflowerBlue"/>
-            <Button x:Name="btnCandy" Click="ButtonCandy" Content="Godis" Height="25px" Width="90px" Background="SkyBlue"/>
-            <Button x:Name="btnTobacco" Click="ButtonTobacco" Content="Tobak" Height="25px" Width="90px" Margin="5,0,5,0" Background="LightBlue"/>
-            <Button x:Name="btnPaper" Click="ButtonPaper" Content="Tidningar" Height="25px" Width="90px" Background="LightSteelBlue"/>
+            <Button x:Name="btnFood" Click="ButtonFood" Content="Enkel Mat" Height="90" Width="200" Margin="0,0,5,0" Background="CornflowerBlue"/>
+            <Button x:Name="btnCandy" Click="ButtonCandy" Content="Godis" Height="90" Width="200" Background="SkyBlue"/>
+            <Button x:Name="btnTobacco" Click="ButtonTobacco" Content="Tobak" Height="90" Width="200" Margin="5,0,5,0" Background="LightBlue"/>
+            <Button x:Name="btnPaper" Click="ButtonPaper" Content="Tidningar" Height="90" Width="200" Background="LightSteelBlue"/>
         </StackPanel>
 
         <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Right" Grid.Row="1" Grid.Column="1" Margin="0,0,5,5">
-            <Button x:Name="btnPay" Click="ButtonPay" Background="Lime" Height="30px" Width="100px" Margin="0,0,5,0" Content="Betala"/>
-            <Button x:Name="btnClear" Click="ButtonClearCart" Background="Red" Height="30px" Width="100px" Content="Rensa"/>
+            <Button x:Name="btnPay" Click="ButtonPay" Background="Lime" Height="90" Width="230" Margin="0,0,5,0" Content="Betala"/>
+            <Button x:Name="btnClear" Click="ButtonClearCart" Background="Red" Height="90" Width="230" Content="Rensa"/>
         </StackPanel>
 
         <StackPanel Grid.Row="2" Grid.ColumnSpan="2" Orientation="Horizontal" Margin="0,5,0,0">
