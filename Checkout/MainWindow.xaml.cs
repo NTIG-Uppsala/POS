@@ -9,48 +9,159 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Xml.Linq;
-using System.Drawing;
+using static Checkout.Product;
 
 namespace Checkout
 {
+
     public partial class MainWindow : Window
     {
         private decimal totalSum = 0;
+
+        private List<Product> allProducts = new List<Product>()
+        {
+            new Product("Korv med bröd", 25, "Food"),
+            new Product("Varm toast (ost & skinka)", 30, "Food"),
+            new Product("Pirog (köttfärs)", 22, "Food"),
+            new Product("Färdig sallad (kyckling)", 49, "Food"),
+            new Product("Panini (mozzarella & pesto)", 45, "Food"),
+
+            new Product("Marabou Mjölkchoklad 100 g", 25, "Candy"),
+            new Product("Daim dubbel", 15, "Candy"),
+            new Product("Kexchoklad", 12, "Candy"),
+            new Product("Malaco Gott & Blandat 160 g", 28, "Candy"),
+
+            new Product("Marlboro Red (20-pack)", 89, "Tobacco"),
+            new Product("Camel Blue (20-pack)", 85, "Tobacco"),
+            new Product("L&M Filter (20-pack)", 79, "Tobacco"),
+            new Product("Skruf Original Portion", 62, "Tobacco"),
+            new Product("Göteborgs Rapé White Portion", 67, "Tobacco"),
+
+            new Product("Aftonbladet (dagens)", 28, "Paper"),
+            new Product("Expressen (dagens)", 28, "Paper"),
+            new Product("Illustrerad Vetenskap", 79, "Paper"),
+            new Product("Kalle Anka & Co", 45, "Paper"),
+            new Product("Allt om Mat", 69, "Paper"),
+        };
 
         public MainWindow()
         {
             InitializeComponent();
         }
 
+        private void ToggleCategoryPanel(string category, StackPanel targetPanel, string colorHex)
+        {
+            // Stäng alla andra paneler
+            var panels = new List<StackPanel> { panelFood, panelCandy, panelTobacco, panelPaper };
+            foreach (var panel in panels)
+            {
+                if (panel != targetPanel)
+                {
+                    panel.Visibility = Visibility.Collapsed;
+                    panel.Children.Clear();
+                }
+            }
+
+            // Om panel redan syns → stäng den
+            if (targetPanel.Visibility == Visibility.Visible)
+            {
+                targetPanel.Visibility = Visibility.Collapsed;
+                targetPanel.Children.Clear();
+                return;
+            }
+
+            // Visa panel
+            targetPanel.Children.Clear();
+            targetPanel.Visibility = Visibility.Visible;
+
+            var items = allProducts.Where(p => p.Category == category);
+
+            foreach (var product in items)
+            {
+                Button b = new Button()
+                {
+                    Content = product.Name,
+                    Tag = product,
+                    Margin = new Thickness(0, 5, 0, 5),
+                    HorizontalAlignment = HorizontalAlignment.Stretch,
+                    Width = 170,
+                    Height = 60,
+                    Background = (Brush)new BrushConverter().ConvertFromString(colorHex),
+                    HorizontalContentAlignment = HorizontalAlignment.Center,
+                    VerticalContentAlignment = VerticalAlignment.Center,
+                    FontSize = 12
+                };
+                b.Click += ProductSelected;
+                targetPanel.Children.Add(b);
+            }
+        }
+
+        private List<CartItem> cart = new List<CartItem>();
+
+        private void ProductSelected(object sender, RoutedEventArgs e)
+        {
+            Button button = sender as Button;
+            Product product = button.Tag as Product;
+
+            // Kolla om produkten redan finns i kundvagnen
+            var existingItem = cart.FirstOrDefault(c => c.Product.Name == product.Name);
+
+            if (existingItem != null)
+            {
+                existingItem.Quantity++;
+            }
+            else
+            {
+                cart.Add(new CartItem { Product = product, Quantity = 1 });
+            }
+
+            UpdateCartDisplay();
+        }
+        private void UpdateCartDisplay()
+        {
+            lstProducts.Items.Clear();
+            totalSum = 0;
+
+            foreach (var item in cart)
+            {
+                lstProducts.Items.Add($"{item.Product.Name} x{item.Quantity} - {item.Product.Price * item.Quantity} kr");
+                totalSum += item.Product.Price * item.Quantity;
+            }
+
+            UpdateTotal();
+        }
+
         private void ButtonFood(object sender, RoutedEventArgs e)
         {
-
+            ToggleCategoryPanel("Food", panelFood, "#FF6495ED"); // CornflowerBlue
         }
 
         private void ButtonCandy(object sender, RoutedEventArgs e)
         {
-
+            ToggleCategoryPanel("Candy", panelCandy, "#FF87CEEB"); // SkyBlue
         }
 
         private void ButtonTobacco(object sender, RoutedEventArgs e)
         {
-
+            ToggleCategoryPanel("Tobacco", panelTobacco, "#FFADD8E6"); // LightBlue
         }
 
         private void ButtonPaper(object sender, RoutedEventArgs e)
         {
-
+            ToggleCategoryPanel("Paper", panelPaper, "#FFB0C4DE"); // LightSteelBlue
         }
 
-        private void ButtonPay(object sender, RoutedEventArgs e)
+        private void ButtonClearCart(object sender, RoutedEventArgs e)
         {
+            cart.Clear(); // <-- töm listan
             lstProducts.Items.Clear();
             totalSum = 0;
             UpdateTotal();
         }
 
-        private void ButtonClearCart(object sender, RoutedEventArgs e)
+        private void ButtonPay(object sender, RoutedEventArgs e)
         {
+            cart.Clear(); // <-- töm listan
             lstProducts.Items.Clear();
             totalSum = 0;
             UpdateTotal();

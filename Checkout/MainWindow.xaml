@@ -21,7 +21,7 @@
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="200" />
+            <ColumnDefinition Width="400" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
@@ -29,13 +29,38 @@
 
         <ListBox Grid.Row="1" x:Name="lstProducts"/>
 
+        <Grid Grid.Row="1" Grid.Column="1" Margin="5,0,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="200"/>
+                <ColumnDefinition Width="200"/>
+                <ColumnDefinition Width="200"/>
+                <ColumnDefinition Width="200"/>
+            </Grid.ColumnDefinitions>
 
-        <StackPanel Orientation="Horizontal" VerticalAlignment="Top" Grid.Row="1" Grid.Column="1" Margin="5,5,0,5">
-            <Button x:Name="btnFood" Click="ButtonFood" Content="Enkel Mat" Height="90" Width="200" Margin="0,0,5,0" Background="CornflowerBlue"/>
-            <Button x:Name="btnCandy" Click="ButtonCandy" Content="Godis" Height="90" Width="200" Background="SkyBlue"/>
-            <Button x:Name="btnTobacco" Click="ButtonTobacco" Content="Tobak" Height="90" Width="200" Margin="5,0,5,0" Background="LightBlue"/>
-            <Button x:Name="btnPaper" Click="ButtonPaper" Content="Tidningar" Height="90" Width="200" Background="LightSteelBlue"/>
-        </StackPanel>
+            <!-- Enkel Mat -->
+            <StackPanel Orientation="Vertical" Grid.Column="0" HorizontalAlignment="Center">
+                <Button x:Name="btnFood" Click="ButtonFood" Content="Enkel Mat" Height="70" Width="170" Background="CornflowerBlue"/>
+                <StackPanel x:Name="panelFood" Visibility="Collapsed"/>
+            </StackPanel>
+
+            <!-- Godis -->
+            <StackPanel Orientation="Vertical" Grid.Column="1" HorizontalAlignment="Center">
+                <Button x:Name="btnCandy" Click="ButtonCandy" Content="Godis" Height="70" Width="170" Background="SkyBlue"/>
+                <StackPanel x:Name="panelCandy" Visibility="Collapsed"/>
+            </StackPanel>
+
+            <!-- Tobak -->
+            <StackPanel Orientation="Vertical" Grid.Column="2" HorizontalAlignment="Center">
+                <Button x:Name="btnTobacco" Click="ButtonTobacco" Content="Tobak" Height="70" Width="170" Background="LightBlue"/>
+                <StackPanel x:Name="panelTobacco" Visibility="Collapsed"/>
+            </StackPanel>
+
+            <!-- Tidningar -->
+            <StackPanel Orientation="Vertical" Grid.Column="3" HorizontalAlignment="Center">
+                <Button x:Name="btnPaper" Click="ButtonPaper" Content="Tidningar" Height="70" Width="170" Background="LightSteelBlue"/>
+                <StackPanel x:Name="panelPaper" Visibility="Collapsed"/>
+            </StackPanel>
+        </Grid>
 
         <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Right" Grid.Row="1" Grid.Column="1" Margin="0,0,5,5">
             <Button x:Name="btnPay" Click="ButtonPay" Background="Lime" Height="90" Width="230" Margin="0,0,5,0" Content="Betala"/>
