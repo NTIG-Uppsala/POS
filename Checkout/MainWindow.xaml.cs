@@ -153,18 +153,41 @@ namespace Checkout
 
         private void ButtonClearCart(object sender, RoutedEventArgs e)
         {
-            cart.Clear(); // <-- töm listan
+            if (cart.Count == 0)
+            {
+                MessageBox.Show("Kundvagnen är redan tom.", "Rensa kundvagn", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            cart.Clear();
             lstProducts.Items.Clear();
             totalSum = 0;
             UpdateTotal();
+
+            MessageBox.Show("Kundvagnen har rensats.", "Rensa kundvagn", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         private void ButtonPay(object sender, RoutedEventArgs e)
         {
-            cart.Clear(); // <-- töm listan
+            if (cart.Count == 0)
+            {
+                MessageBox.Show("Kundvagnen är tom!");
+                return;
+            }
+
+            // Spara totalen innan vi nollställer
+            var currentTotal = totalSum;
+
+            // Töm kundvagn och listbox direkt
+            cart.Clear();
             lstProducts.Items.Clear();
+
+            // Nollställ totalen för testet
             totalSum = 0;
             UpdateTotal();
+
+            // Visa meddelande med den sparade summan
+            MessageBox.Show($"Tack för ditt köp!\nTotalt: {currentTotal} kr", "Betalning slutförd", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         private void UpdateTotal()

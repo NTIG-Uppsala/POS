@@ -40,25 +40,25 @@
             <!-- Enkel Mat -->
             <StackPanel Orientation="Vertical" Grid.Column="0" HorizontalAlignment="Center">
                 <Button x:Name="btnFood" Click="ButtonFood" Content="Enkel Mat" Height="70" Width="170" Background="CornflowerBlue"/>
-                <StackPanel x:Name="panelFood" Visibility="Collapsed"/>
+                <StackPanel x:Name="panelFood" Visibility="Collapsed" AutomationProperties.Name="panelFood"/>
             </StackPanel>
 
             <!-- Godis -->
             <StackPanel Orientation="Vertical" Grid.Column="1" HorizontalAlignment="Center">
                 <Button x:Name="btnCandy" Click="ButtonCandy" Content="Godis" Height="70" Width="170" Background="SkyBlue"/>
-                <StackPanel x:Name="panelCandy" Visibility="Collapsed"/>
+                <StackPanel x:Name="panelCandy" Visibility="Collapsed" AutomationProperties.Name="panelCandy"/>
             </StackPanel>
 
             <!-- Tobak -->
             <StackPanel Orientation="Vertical" Grid.Column="2" HorizontalAlignment="Center">
                 <Button x:Name="btnTobacco" Click="ButtonTobacco" Content="Tobak" Height="70" Width="170" Background="LightBlue"/>
-                <StackPanel x:Name="panelTobacco" Visibility="Collapsed"/>
+                <StackPanel x:Name="panelTobacco" Visibility="Collapsed" AutomationProperties.Name="panelTobacco"/>
             </StackPanel>
 
             <!-- Tidningar -->
             <StackPanel Orientation="Vertical" Grid.Column="3" HorizontalAlignment="Center">
                 <Button x:Name="btnPaper" Click="ButtonPaper" Content="Tidningar" Height="70" Width="170" Background="LightSteelBlue"/>
-                <StackPanel x:Name="panelPaper" Visibility="Collapsed"/>
+                <StackPanel x:Name="panelPaper" Visibility="Collapsed" AutomationProperties.Name="panelPaper"/>
             </StackPanel>
         </Grid>
 
