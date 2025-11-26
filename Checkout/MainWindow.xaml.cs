@@ -163,8 +163,6 @@ namespace Checkout
             lstProducts.Items.Clear();
             totalSum = 0;
             UpdateTotal();
-
-            MessageBox.Show("Kundvagnen har rensats.", "Rensa kundvagn", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         private void ButtonPay(object sender, RoutedEventArgs e)
@@ -185,9 +183,6 @@ namespace Checkout
             // Nollställ totalen för testet
             totalSum = 0;
             UpdateTotal();
-
-            // Visa meddelande med den sparade summan
-            MessageBox.Show($"Tack för ditt köp!\nTotalt: {currentTotal} kr", "Betalning slutförd", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         private void UpdateTotal()
