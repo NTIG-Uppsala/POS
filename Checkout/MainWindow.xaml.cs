@@ -26,7 +26,7 @@ namespace Checkout
             new Product("Varm toast (ost & skinka)", 30, "Food"),
             new Product("Pirog (köttfärs)", 22, "Food"),
             new Product("Färdig sallad (kyckling)", 49, "Food"),
-            new Product("Panini (kebab & vitlök)", 45, "Food"),
+            new Product("Panini (mozzarella & pesto)", 45, "Food"),
 
             new Product("Marabou Mjölkchoklad 100 g", 25, "Candy"),
             new Product("Daim dubbel", 15, "Candy"),
