@@ -14,64 +14,149 @@
 
     <Grid Margin="10">
 
-        <Grid.RowDefinitions>
-            <RowDefinition Height="auto" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
+        <TabControl x:Name="mainTabControl">
+            <!-- Försäljning -->
+            <TabItem Header="Försäljning">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="400"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
 
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="400" />
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
+                    <Label Content="Varukorg" Grid.Row="0" Grid.Column="0" FontWeight="Bold"/>
 
-        <Label>Varukorg</Label>
+                    <ListBox Grid.Row="1" Grid.Column="0" x:Name="lstProducts"/>
 
-        <ListBox Grid.Row="1" x:Name="lstProducts"/>
+                    <!-- Produktpanel -->
+                    <Grid Grid.Row="1" Grid.Column="1" Margin="5,0,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="200"/>
+                            <ColumnDefinition Width="200"/>
+                            <ColumnDefinition Width="200"/>
+                            <ColumnDefinition Width="200"/>
+                        </Grid.ColumnDefinitions>
 
-        <Grid Grid.Row="1" Grid.Column="1" Margin="5,0,0,0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="200"/>
-                <ColumnDefinition Width="200"/>
-                <ColumnDefinition Width="200"/>
-                <ColumnDefinition Width="200"/>
-            </Grid.ColumnDefinitions>
+                        <!-- Enkel Mat -->
+                        <StackPanel Orientation="Vertical" Grid.Column="0" HorizontalAlignment="Center">
+                            <Button x:Name="btnFood" Click="ButtonFood" Content="Enkel Mat" Height="70" Width="170" Background="CornflowerBlue" FontWeight="Bold"/>
+                            <StackPanel x:Name="panelFood" Visibility="Collapsed"/>
+                        </StackPanel>
 
-            <!-- Enkel Mat -->
-            <StackPanel Orientation="Vertical" Grid.Column="0" HorizontalAlignment="Center">
-                <Button x:Name="btnFood" Click="ButtonFood" Content="Enkel Mat" Height="70" Width="170" Background="CornflowerBlue"/>
-                <StackPanel x:Name="panelFood" Visibility="Collapsed" AutomationProperties.Name="panelFood"/>
-            </StackPanel>
+                        <!-- Godis -->
+                        <StackPanel Orientation="Vertical" Grid.Column="1" HorizontalAlignment="Center">
+                            <Button x:Name="btnCandy" Click="ButtonCandy" Content="Godis" Height="70" Width="170" Background="SkyBlue" FontWeight="Bold"/>
+                            <StackPanel x:Name="panelCandy" Visibility="Collapsed"/>
+                        </StackPanel>
 
-            <!-- Godis -->
-            <StackPanel Orientation="Vertical" Grid.Column="1" HorizontalAlignment="Center">
-                <Button x:Name="btnCandy" Click="ButtonCandy" Content="Godis" Height="70" Width="170" Background="SkyBlue"/>
-                <StackPanel x:Name="panelCandy" Visibility="Collapsed" AutomationProperties.Name="panelCandy"/>
-            </StackPanel>
+                        <!-- Tobak -->
+                        <StackPanel Orientation="Vertical" Grid.Column="2" HorizontalAlignment="Center">
+                            <Button x:Name="btnTobacco" Click="ButtonTobacco" Content="Tobak" Height="70" Width="170" Background="LightBlue" FontWeight="Bold"/>
+                            <StackPanel x:Name="panelTobacco" Visibility="Collapsed"/>
+                        </StackPanel>
 
-            <!-- Tobak -->
-            <StackPanel Orientation="Vertical" Grid.Column="2" HorizontalAlignment="Center">
-                <Button x:Name="btnTobacco" Click="ButtonTobacco" Content="Tobak" Height="70" Width="170" Background="LightBlue"/>
-                <StackPanel x:Name="panelTobacco" Visibility="Collapsed" AutomationProperties.Name="panelTobacco"/>
-            </StackPanel>
+                        <!-- Tidningar -->
+                        <StackPanel Orientation="Vertical" Grid.Column="3" HorizontalAlignment="Center">
+                            <Button x:Name="btnPaper" Click="ButtonPaper" Content="Tidningar" Height="70" Width="170" Background="LightSteelBlue" FontWeight="Bold"/>
+                            <StackPanel x:Name="panelPaper" Visibility="Collapsed"/>
+                        </StackPanel>
+                    </Grid>
 
-            <!-- Tidningar -->
-            <StackPanel Orientation="Vertical" Grid.Column="3" HorizontalAlignment="Center">
-                <Button x:Name="btnPaper" Click="ButtonPaper" Content="Tidningar" Height="70" Width="170" Background="LightSteelBlue"/>
-                <StackPanel x:Name="panelPaper" Visibility="Collapsed" AutomationProperties.Name="panelPaper"/>
-            </StackPanel>
-        </Grid>
+                    <!-- Betal och Rensa -->
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Right" Grid.Row="1" Grid.Column="1" Margin="0,0,5,5">
+                        <Button x:Name="btnPay" Click="ButtonPay" Background="Lime" Height="90" Width="230" Margin="0,0,5,0" Content="Betala" FontWeight="Bold"/>
+                        <Button x:Name="btnClear" Click="ButtonClearCart" Background="Red" Height="90" Width="230" Content="Rensa" FontWeight="Bold"/>
+                    </StackPanel>
 
-        <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Right" Grid.Row="1" Grid.Column="1" Margin="0,0,5,5">
-            <Button x:Name="btnPay" Click="ButtonPay" Background="Lime" Height="90" Width="230" Margin="0,0,5,0" Content="Betala"/>
-            <Button x:Name="btnClear" Click="ButtonClearCart" Background="Red" Height="90" Width="230" Content="Rensa"/>
-        </StackPanel>
+                    <!-- Total -->
+                    <StackPanel Grid.Row="2" Grid.ColumnSpan="2" Orientation="Horizontal" Margin="0,5,0,0">
+                        <TextBlock Text="Total Pris:" VerticalAlignment="Center" FontWeight="Bold"/>
+                        <TextBlock x:Name="txtTotal" Text="0 kr" FontWeight="Bold" Margin="5,0,0,0"/>
+                    </StackPanel>
+                </Grid>
+            </TabItem>
 
-        <StackPanel Grid.Row="2" Grid.ColumnSpan="2" Orientation="Horizontal" Margin="0,5,0,0">
-            <TextBlock Text="Total Pris:" VerticalAlignment="Center" FontWeight="Bold"/>
-            <TextBlock x:Name="txtTotal" Text="0 kr" FontWeight="Bold" Margin="5,0,0,0"/>
-        </StackPanel>
+            <!-- Kvitton -->
+            <TabItem Header="Kvitton">
+                <Grid Margin="10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*"/>
+                        <!-- Vänster ruta -->
+                        <ColumnDefinition Width="3*"/>
+                        <!-- Höger ruta (bredare) -->
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Vänster sida: kvittolista -->
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="Lista över kvitton:" Margin="0 0 0 5" FontWeight="Bold"/>
+                        <ListBox x:Name="lstReceipts" SelectionChanged="ReceiptSelected"/>
+                    </StackPanel>
+
+                    <!-- Höger sida: kvittodetaljer -->
+                    <Border Grid.Column="1" Background="#F3F3F3" CornerRadius="8" Padding="15" Margin="10 0 0 0">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <StackPanel x:Name="receiptDetailsPanel">
+                                <TextBlock Text="Kvittoinformation" FontWeight="Bold" FontSize="22" Margin="0 0 0 15"/>
+
+                                <TextBlock x:Name="txtReceiptNumber"/>
+                                <TextBlock x:Name="txtReceiptTime" Margin="0 5 0 0"/>
+
+                                <Separator Margin="0 10 0 10"/>
+
+                                <Grid Margin="0 10 0 5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <!-- Produkt: tar allt utrymme -->
+                                        <ColumnDefinition Width="70"/>
+                                        <!-- Antal -->
+                                        <ColumnDefinition Width="90"/>
+                                        <!-- Pris -->
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock Text="Produkt" FontWeight="Bold" Grid.Column="0"/>
+                                    <TextBlock Text="Antal" FontWeight="Bold" Grid.Column="1" HorizontalAlignment="Right"/>
+                                    <TextBlock Text="Pris" FontWeight="Bold" Grid.Column="2" HorizontalAlignment="Right"/>
+                                </Grid>
+
+                                <ItemsControl x:Name="itemsReceiptPanel">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid Margin="0 3 0 3">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <!-- Produkt -->
+                                                    <ColumnDefinition Width="70"/>
+                                                    <!-- Antal -->
+                                                    <ColumnDefinition Width="90"/>
+                                                    <!-- Pris -->
+                                                </Grid.ColumnDefinitions>
+
+                                                <!-- Produktnamn -->
+                                                <TextBlock Text="{Binding Product.Name}" Grid.Column="0"/>
+
+                                                <!-- Antal -->
+                                                <TextBlock Text="{Binding Quantity}" Grid.Column="1" HorizontalAlignment="Right"/>
+
+                                                <!-- Pris + kr -->
+                                                <TextBlock Text="{Binding Product.Price, StringFormat='{}{0} kr'}" Grid.Column="2" HorizontalAlignment="Right"/>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
 
 
+                                <Separator Margin="0 10 0 10"/>
+
+                                <TextBlock x:Name="txtReceiptTotal" FontWeight="Bold" FontSize="20"/>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </Border>
+                </Grid>
+            </TabItem>
+        </TabControl>
     </Grid>
 </Window>

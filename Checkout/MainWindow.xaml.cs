@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -7,9 +8,10 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Xml.Linq;
 using static Checkout.Product;
+using static Checkout.Receipt; 
+
 
 namespace Checkout
 {
@@ -24,7 +26,7 @@ namespace Checkout
             new Product("Varm toast (ost & skinka)", 30, "Food"),
             new Product("Pirog (köttfärs)", 22, "Food"),
             new Product("Färdig sallad (kyckling)", 49, "Food"),
-            new Product("Panini (mozzarella & pesto)", 45, "Food"),
+            new Product("Panini (kebab & vitlök)", 45, "Food"),
 
             new Product("Marabou Mjölkchoklad 100 g", 25, "Candy"),
             new Product("Daim dubbel", 15, "Candy"),
@@ -173,14 +175,22 @@ namespace Checkout
                 return;
             }
 
-            // Spara totalen innan vi nollställer
-            var currentTotal = totalSum;
+            // Skapa kvitto
+            var receipt = ReceiptManager.CreateReceipt(cart.ToList());
 
-            // Töm kundvagn och listbox direkt
+            // Visa kvittot i listboxen
+            lstReceipts.Items.Add($"Kvittosnr: {receipt.ReceiptNumber}, Total: {receipt.TotalPrice} kr, Tid: {receipt.Timestamp}");
+
+            // Spara som PDF (exempelväg)
+            string folder = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            string filePath = Path.Combine(folder, $"Receipt_{receipt.ReceiptNumber}.pdf");
+            receipt.SaveAsPdf(filePath);
+
+            MessageBox.Show($"Kvitto sparat som PDF:\n{filePath}", "Kvitto");
+
+            // Töm kundvagn
             cart.Clear();
             lstProducts.Items.Clear();
-
-            // Nollställ totalen för testet
             totalSum = 0;
             UpdateTotal();
         }
@@ -188,6 +198,19 @@ namespace Checkout
         private void UpdateTotal()
         {
             txtTotal.Text = $"{totalSum} kr";
+        }
+
+        private void ReceiptSelected(object sender, SelectionChangedEventArgs e)
+        {
+            if (lstReceipts.SelectedIndex < 0) return;
+
+            var receipt = Receipt.ReceiptManager.AllReceipts[lstReceipts.SelectedIndex];
+
+            txtReceiptNumber.Text = $"Kvittonr: {receipt.ReceiptNumber}";
+            txtReceiptTime.Text = $"Tid: {receipt.Timestamp}";
+            txtReceiptTotal.Text = $"Total: {receipt.TotalPrice} kr";
+
+            itemsReceiptPanel.ItemsSource = receipt.Items;
         }
     }
 }
