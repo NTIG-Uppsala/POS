@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auto-Testing", "Auto-Testin
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Setup", "Setup\Setup.vdproj", "{DBE9999D-346E-CA63-6964-F3B7FC1D42B4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sqlite", "Sqlite\Sqlite.csproj", "{AD99FD70-E6BB-4ACB-B191-C5F23C588FB7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,6 +27,10 @@ Global
 		{0F8D4995-F5B2-FD1D-10A2-A36128045EDE}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DBE9999D-346E-CA63-6964-F3B7FC1D42B4}.Debug|Any CPU.ActiveCfg = Debug
 		{DBE9999D-346E-CA63-6964-F3B7FC1D42B4}.Release|Any CPU.ActiveCfg = Release
+		{AD99FD70-E6BB-4ACB-B191-C5F23C588FB7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AD99FD70-E6BB-4ACB-B191-C5F23C588FB7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AD99FD70-E6BB-4ACB-B191-C5F23C588FB7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AD99FD70-E6BB-4ACB-B191-C5F23C588FB7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
