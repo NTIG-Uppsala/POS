@@ -205,5 +205,123 @@ namespace CheckoutTests
                 Trace.Assert(cartText.Contains($"x{i}"), $"Product quantity should be x{i} in cart, got '{cartText}'");
             }
         }
+
+        [TestMethod]
+        public void Test_ReceiptAdded_AfterPayment()
+        {
+            var app = FlaUI.Core.Application.Launch(AppPath);
+            using var automation = new UIA3Automation();
+            var window = app.GetMainWindow(automation);
+
+            ConditionFactory cf = new ConditionFactory(new UIA3PropertyLibrary());
+
+            // Öppna mat
+            var foodButton = window.FindFirstDescendant(cf.ByAutomationId("btnFood")).AsButton();
+            foodButton.Click();
+
+            // Klicka produkt
+            var productButton = window.FindFirstDescendant(cf.ByName("Korv med bröd")).AsButton();
+            productButton.Click();
+
+            // Betala
+            var payButton = window.FindFirstDescendant(cf.ByAutomationId("btnPay")).AsButton();
+            payButton.Click();
+
+            // Gå till kvittotabben
+            var tab = window.FindFirstDescendant(cf.ByName("Kvitton")).AsTabItem();
+            tab.Select();
+
+            // Hitta kvittolista
+            var receiptList = window.FindFirstDescendant(cf.ByAutomationId("lstReceipts")).AsListBox();
+
+            Assert.AreEqual(1, receiptList.Items.Length, "There should be exactly 1 receipt added.");
+        }
+
+        [TestMethod]
+        public void Test_ReceiptDetails_ShownOnSelect()
+        {
+            var app = FlaUI.Core.Application.Launch(AppPath);
+            using var automation = new UIA3Automation();
+            var window = app.GetMainWindow(automation);
+            ConditionFactory cf = new ConditionFactory(new UIA3PropertyLibrary());
+
+            // Lägg till produkt
+            var foodButton = window.FindFirstDescendant(cf.ByAutomationId("btnFood")).AsButton();
+            foodButton.Click();
+            var productButton = window.FindFirstDescendant(cf.ByName("Korv med bröd")).AsButton();
+            productButton.Click();
+
+            // Betala
+            var payButton = window.FindFirstDescendant(cf.ByAutomationId("btnPay")).AsButton();
+            payButton.Click();
+
+            // Gå till kvittotabben
+            var tab = window.FindFirstDescendant(cf.ByName("Kvitton")).AsTabItem();
+            tab.Select();
+
+            var receiptList = window.FindFirstDescendant(cf.ByAutomationId("lstReceipts")).AsListBox();
+            receiptList.Select(0);
+
+            var receiptNumber = window.FindFirstDescendant(cf.ByAutomationId("txtReceiptNumber")).AsLabel();
+            var total = window.FindFirstDescendant(cf.ByAutomationId("txtReceiptTotal")).AsLabel();
+
+            Assert.IsTrue(receiptNumber.Text.Contains("Kvittonr:"), "Receipt number should be displayed.");
+            Assert.AreEqual("Total: 25 kr", total.Text, "Total price should match purchased product.");
+        }
+
+        [TestMethod]
+        public void Test_ReceiptItems_ListedCorrectly()
+        {
+            var app = FlaUI.Core.Application.Launch(AppPath);
+            using var automation = new UIA3Automation();
+            var window = app.GetMainWindow(automation);
+            ConditionFactory cf = new ConditionFactory(new UIA3PropertyLibrary());
+
+            // Öppna och köp två produkter
+            var foodButton = window.FindFirstDescendant(cf.ByAutomationId("btnFood")).AsButton();
+            foodButton.Click();
+            window.FindFirstDescendant(cf.ByName("Korv med bröd")).AsButton().Click();
+            window.FindFirstDescendant(cf.ByName("Varm toast (ost & skinka)")).AsButton().Click();
+
+            // Betala
+            window.FindFirstDescendant(cf.ByAutomationId("btnPay")).AsButton().Click();
+
+            // Gå till kvitton
+            window.FindFirstDescendant(cf.ByName("Kvitton")).AsTabItem().Select();
+
+            var receiptList = window.FindFirstDescendant(cf.ByAutomationId("lstReceipts")).AsListBox();
+            receiptList.Select(0);
+
+            var itemsPanel = window.FindFirstDescendant(cf.ByAutomationId("itemsReceiptPanel")).AsListBox();
+
+            Assert.AreEqual(2, itemsPanel.Items.Length, "Receipt should list 2 purchased items.");
+        }
+
+        [TestMethod]
+        public void Test_ReceiptNumber_Increments()
+        {
+            var app = FlaUI.Core.Application.Launch(AppPath);
+            using var automation = new UIA3Automation();
+            var window = app.GetMainWindow(automation);
+            ConditionFactory cf = new ConditionFactory(new UIA3PropertyLibrary());
+
+            var foodButton = window.FindFirstDescendant(cf.ByAutomationId("btnFood")).AsButton();
+            foodButton.Click();
+
+            // Gör två köp
+            for (int i = 0; i < 2; i++)
+            {
+                window.FindFirstDescendant(cf.ByName("Korv med bröd")).AsButton().Click();
+                window.FindFirstDescendant(cf.ByAutomationId("btnPay")).AsButton().Click();
+            }
+
+            // Gå till kvitton
+            window.FindFirstDescendant(cf.ByName("Kvitton")).AsTabItem().Select();
+
+            var receiptList = window.FindFirstDescendant(cf.ByAutomationId("lstReceipts")).AsListBox();
+
+            Assert.IsTrue(receiptList.Items[0].Text.Contains("1"));
+            Assert.IsTrue(receiptList.Items[1].Text.Contains("2"));
+        }
     }
 }

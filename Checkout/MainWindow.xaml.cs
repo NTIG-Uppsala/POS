@@ -186,8 +186,6 @@ namespace Checkout
             string filePath = Path.Combine(folder, $"Receipt_{receipt.ReceiptNumber}.pdf");
             receipt.SaveAsPdf(filePath);
 
-            MessageBox.Show($"Kvitto sparat som PDF:\n{filePath}", "Kvitto");
-
             // Töm kundvagn
             cart.Clear();
             lstProducts.Items.Clear();
