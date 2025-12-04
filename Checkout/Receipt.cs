@@ -57,7 +57,7 @@ namespace Checkout
         public void SaveAsPdf(string filePath)
         {
             PdfDocument document = new PdfDocument();
-            document.Info.Title = $"Kvittosnr: {ReceiptNumber}";
+            document.Info.Title = $"Kvittonr: {ReceiptNumber}";
             PdfPage page = document.AddPage();
             XGraphics gfx = XGraphics.FromPdfPage(page);
 
@@ -65,12 +65,13 @@ namespace Checkout
             XFont regularFont = new XFont("Arial", 12, XFontStyle.Regular);
 
             double yPoint = 20;
-
             double regularLineHeight = 25;
             double headerLineHeight = 22;
-
-            // Nytt, korrekt avstånd efter linjer
             double lineGap = 30;
+
+            decimal taxRate = 0.25m; // 25% moms
+            decimal taxAmount = TotalPrice * taxRate;
+            decimal totalWithTax = TotalPrice;
 
             // --- Affärsinformation ---
             gfx.DrawString(StoreInfo.StoreName, headerFont, XBrushes.Black,
@@ -115,8 +116,14 @@ namespace Checkout
             gfx.DrawLine(XPens.Black, 20, yPoint, page.Width - 20, yPoint);
             yPoint += regularLineHeight;
 
-            // --- TOTAL ---
-            gfx.DrawString($"TOTALT: {TotalPrice} kr", headerFont, XBrushes.Black, 20, yPoint);
+            // --- TOTAL & Moms ---
+            gfx.DrawString($"TOTALT exkl. moms: {TotalPrice - taxAmount:F2} kr", headerFont, XBrushes.Black, 20, yPoint);
+            yPoint += headerLineHeight;
+
+            gfx.DrawString($"MOMS {taxRate * 100}%: {taxAmount:F2} kr", headerFont, XBrushes.Black, 20, yPoint);
+            yPoint += headerLineHeight;
+
+            gfx.DrawString($"TOTALT inkl. moms: {totalWithTax:F2} kr", headerFont, XBrushes.Black, 20, yPoint);
             yPoint += headerLineHeight;
 
             gfx.DrawString("Tack för ditt köp!", regularFont, XBrushes.Black, 20, yPoint);
@@ -124,10 +131,11 @@ namespace Checkout
             document.Save(filePath);
         }
 
+
         public static class StoreInfo
         {
             public static string StoreName { get; set; } = "Connys Gottebod";
-            public static string Address { get; set; } = "Kioskvägen 2, 753 28 Uppala";
+            public static string Address { get; set; } = "Kioskvägen 2, 753 28 Uppsala";
             public static string OrgNumber { get; set; } = "Org.nr: 654321-0987";
         }
 
@@ -143,6 +151,5 @@ namespace Checkout
                 return receipt;
             }
         }
-
     }
 }

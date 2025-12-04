@@ -204,9 +204,17 @@ namespace Checkout
 
             var receipt = Receipt.ReceiptManager.AllReceipts[lstReceipts.SelectedIndex];
 
+            decimal moms = Math.Round(receipt.TotalPrice * 0.25m, 2);
+            decimal exklMoms = Math.Round(receipt.TotalPrice - moms, 2);
+
             txtReceiptNumber.Text = $"Kvittonr: {receipt.ReceiptNumber}";
             txtReceiptTime.Text = $"Tid: {receipt.Timestamp}";
-            txtReceiptTotal.Text = $"Total: {receipt.TotalPrice} kr";
+
+            // Lägg till total + momsrad
+            txtReceiptTotal.Text =
+                $"Exkl moms: {exklMoms} kr\n" +
+                $"Moms (25%): {moms} kr\n" +
+                $"Total: {receipt.TotalPrice} kr";
 
             itemsReceiptPanel.ItemsSource = receipt.Items;
         }

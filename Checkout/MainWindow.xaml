@@ -142,7 +142,8 @@
                                                 <TextBlock Text="{Binding Quantity}" Grid.Column="1" HorizontalAlignment="Right"/>
 
                                                 <!-- Pris + kr -->
-                                                <TextBlock Text="{Binding Product.Price, StringFormat='{}{0} kr'}" Grid.Column="2" HorizontalAlignment="Right"/>
+                                                <TextBlock Text="{Binding TotalPrice, StringFormat='{}{0} kr'}" Grid.Column="2" HorizontalAlignment="Right"/>
+                                                
                                             </Grid>
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
