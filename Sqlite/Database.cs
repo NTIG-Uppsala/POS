@@ -73,7 +73,7 @@ class Program
 
                 var products = new List<(string Category, string Name, double Price)>
                 {
-                    ("Tobak", "Marlboo Red (20-pack)", 89),
+                    ("Tobak", "Marlboro Red (20-pack)", 89),
                     ("Tobak", "Camel Blue (20-pack)", 85),
                     ("Tobak", "L&M Filter (20-pack)", 79),
                     ("Tobak", "Skruf Original Portion", 62),
@@ -143,5 +143,6 @@ class Program
         {
             Console.WriteLine("Error: " + ex.Message);
         }
+
     }
 }

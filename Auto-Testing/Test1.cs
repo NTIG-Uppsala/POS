@@ -18,10 +18,34 @@ namespace CheckoutTests
                 "Checkout.exe"
             );
 
+        private static readonly string TestDbPath =
+    Path.Combine(
+        System.IO.Path.GetFullPath("../../../../Checkout/bin/Debug/net9.0-windows/"),
+        "TestDatabase.db"
+    );
+
+        [TestInitialize]
+        public void Setup()
+        {
+            // Ta bort testdatabasen om den finns
+            if (File.Exists(TestDbPath))
+                File.Delete(TestDbPath);
+
+            // Kopiera originaldatabasen
+            string originalDb = Path.Combine(
+                Path.GetFullPath("../../../../Checkout/bin/Debug/net9.0-windows/"),
+                "Database.db"
+            );
+            File.Copy(originalDb, TestDbPath);
+
+            // Låt ProductRepository använda testdatabasen
+            Checkout.ProductRepository.SetDatabasePath(TestDbPath);
+        }
+
         [TestMethod]
         public void Test_PayButton_EmptiesCart()
         {
-            var app = FlaUI.Core.Application.Launch(AppPath);
+            var app = FlaUI.Core.Application.Launch(AppPath, TestDbPath);
             using var automation = new UIA3Automation();
             var window = app.GetMainWindow(automation);
             Assert.IsNotNull(window, "Main window was not found.");
@@ -58,7 +82,7 @@ namespace CheckoutTests
         [TestMethod]
         public void Test_ClearButton_EmptiesCart()
         {
-            var app = FlaUI.Core.Application.Launch(AppPath);
+            var app = FlaUI.Core.Application.Launch(AppPath, TestDbPath);
             using var automation = new UIA3Automation();
             var window = app.GetMainWindow(automation);
             Assert.IsNotNull(window);
@@ -90,7 +114,7 @@ namespace CheckoutTests
         [TestMethod]
         public void Test_AllDropDownsOpenAndClose()
         {
-            var app = FlaUI.Core.Application.Launch(AppPath);
+            var app = FlaUI.Core.Application.Launch(AppPath, TestDbPath);
             using var automation = new UIA3Automation();
             var window = app.GetMainWindow(automation);
             Assert.IsNotNull(window, "Main window was not found.");
@@ -125,7 +149,7 @@ namespace CheckoutTests
         [TestMethod]
         public void Test_ProductButtons_AddToCart()
         {
-            var app = FlaUI.Core.Application.Launch(AppPath);
+            var app = FlaUI.Core.Application.Launch(AppPath, TestDbPath);
             using var automation = new UIA3Automation();
             var window = app.GetMainWindow(automation);
             Assert.IsNotNull(window);
@@ -170,7 +194,7 @@ namespace CheckoutTests
         [TestMethod]
         public void Test_ProductQuantity_IncrementsCorrectly()
         {
-            var app = FlaUI.Core.Application.Launch(AppPath);
+            var app = FlaUI.Core.Application.Launch(AppPath, TestDbPath);
             using var automation = new UIA3Automation();
             var window = app.GetMainWindow(automation);
             Assert.IsNotNull(window);
@@ -209,7 +233,7 @@ namespace CheckoutTests
         [TestMethod]
         public void Test_ReceiptAdded_AfterPayment()
         {
-            var app = FlaUI.Core.Application.Launch(AppPath);
+            var app = FlaUI.Core.Application.Launch(AppPath, TestDbPath);
             using var automation = new UIA3Automation();
             var window = app.GetMainWindow(automation);
 
@@ -240,7 +264,7 @@ namespace CheckoutTests
         [TestMethod]
         public void Test_ReceiptDetails_ShownOnSelect()
         {
-            var app = FlaUI.Core.Application.Launch(AppPath);
+            var app = FlaUI.Core.Application.Launch(AppPath, TestDbPath);
             using var automation = new UIA3Automation();
             var window = app.GetMainWindow(automation);
             ConditionFactory cf = new ConditionFactory(new UIA3PropertyLibrary());
@@ -266,13 +290,21 @@ namespace CheckoutTests
             var total = window.FindFirstDescendant(cf.ByAutomationId("txtReceiptTotal")).AsLabel();
 
             Assert.IsTrue(receiptNumber.Text.Contains("Kvittonr:"), "Receipt number should be displayed.");
-            Assert.AreEqual("Total: 25 kr", total.Text, "Total price should match purchased product.");
+
+            // Extrahera raden som börjar med "Total:" och jämför
+            var totalLine = total.Text
+                .Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
+                .FirstOrDefault(line => line.StartsWith("Total:"));
+
+            Assert.IsNotNull(totalLine, "Total line not found in receipt.");
+            Assert.AreEqual("Total: 25 kr", totalLine, "Total price should match purchased product.");
         }
+
 
         [TestMethod]
         public void Test_ReceiptItems_ListedCorrectly()
         {
-            var app = FlaUI.Core.Application.Launch(AppPath);
+            var app = FlaUI.Core.Application.Launch(AppPath, TestDbPath);
             using var automation = new UIA3Automation();
             var window = app.GetMainWindow(automation);
             ConditionFactory cf = new ConditionFactory(new UIA3PropertyLibrary());
@@ -300,7 +332,7 @@ namespace CheckoutTests
         [TestMethod]
         public void Test_ReceiptNumber_Increments()
         {
-            var app = FlaUI.Core.Application.Launch(AppPath);
+            var app = FlaUI.Core.Application.Launch(AppPath, TestDbPath);
             using var automation = new UIA3Automation();
             var window = app.GetMainWindow(automation);
             ConditionFactory cf = new ConditionFactory(new UIA3PropertyLibrary());
@@ -323,5 +355,7 @@ namespace CheckoutTests
             Assert.IsTrue(receiptList.Items[0].Text.Contains("1"));
             Assert.IsTrue(receiptList.Items[1].Text.Contains("2"));
         }
+
+        
     }
 }

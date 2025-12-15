@@ -9,8 +9,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Xml.Linq;
+using Microsoft.Data.Sqlite;
 using static Checkout.Product;
-using static Checkout.Receipt; 
+using static Checkout.Receipt;
 
 
 namespace Checkout
@@ -20,82 +21,84 @@ namespace Checkout
     {
         private decimal totalSum = 0;
 
-        private List<Product> allProducts = new List<Product>()
-        {
-            new Product("Korv med bröd", 25, "Food"),
-            new Product("Varm toast (ost & skinka)", 30, "Food"),
-            new Product("Pirog (köttfärs)", 22, "Food"),
-            new Product("Färdig sallad (kyckling)", 49, "Food"),
-            new Product("Panini (mozzarella & pesto)", 45, "Food"),
-
-            new Product("Marabou Mjölkchoklad 100 g", 25, "Candy"),
-            new Product("Daim dubbel", 15, "Candy"),
-            new Product("Kexchoklad", 12, "Candy"),
-            new Product("Malaco Gott & Blandat 160 g", 28, "Candy"),
-
-            new Product("Marlboro Red (20-pack)", 89, "Tobacco"),
-            new Product("Camel Blue (20-pack)", 85, "Tobacco"),
-            new Product("L&M Filter (20-pack)", 79, "Tobacco"),
-            new Product("Skruf Original Portion", 62, "Tobacco"),
-            new Product("Göteborgs Rapé White Portion", 67, "Tobacco"),
-
-            new Product("Aftonbladet (dagens)", 28, "Paper"),
-            new Product("Expressen (dagens)", 28, "Paper"),
-            new Product("Illustrerad Vetenskap", 79, "Paper"),
-            new Product("Kalle Anka & Co", 45, "Paper"),
-            new Product("Allt om Mat", 69, "Paper"),
-        };
+        private List<Product> allProducts;
 
         public MainWindow()
         {
             InitializeComponent();
+
+            allProducts = new List<Product>();
+            foreach (var cat in ProductRepository.GetAllCategories())
+            {
+                var prods = ProductRepository.GetProductsByCategory(cat);
+                allProducts.AddRange(prods);
+            }
+
         }
 
         private void ToggleCategoryPanel(string category, StackPanel targetPanel, string colorHex)
         {
-            // Stäng alla andra paneler
-            var panels = new List<StackPanel> { panelFood, panelCandy, panelTobacco, panelPaper };
-            foreach (var panel in panels)
+            bool isCurrentlyVisible = targetPanel.Visibility == Visibility.Visible;
+
+            // Rensa och dölj alla paneler
+            panelFood.Children.Clear();
+            panelCandy.Children.Clear();
+            panelTobacco.Children.Clear();
+            panelPaper.Children.Clear();
+
+            panelFood.Visibility = Visibility.Collapsed;
+            panelCandy.Visibility = Visibility.Collapsed;
+            panelTobacco.Visibility = Visibility.Collapsed;
+            panelPaper.Visibility = Visibility.Collapsed;
+
+            if (!isCurrentlyVisible)
             {
-                if (panel != targetPanel)
+                // Hämta produkter
+                var items = allProducts.Where(p => p.Category == category);
+
+                foreach (var product in items)
                 {
-                    panel.Visibility = Visibility.Collapsed;
-                    panel.Children.Clear();
+                    Button b = new Button()
+                    {
+                        Content = product.Name,
+                        Tag = product,
+                        Margin = new Thickness(0, 5, 0, 5),
+                        HorizontalAlignment = HorizontalAlignment.Stretch,
+                        Width = 170,
+                        Height = 60,
+                        Background = (Brush)new BrushConverter().ConvertFromString(colorHex),
+                        HorizontalContentAlignment = HorizontalAlignment.Center,
+                        VerticalContentAlignment = VerticalAlignment.Center,
+                        FontSize = 12
+                    };
+                    b.Click += ProductSelected;
+                    targetPanel.Children.Add(b);
                 }
+
+                // Visa panelen
+                targetPanel.Visibility = Visibility.Visible;
             }
+        }
 
-            // Om panel redan syns → stäng den
-            if (targetPanel.Visibility == Visibility.Visible)
-            {
-                targetPanel.Visibility = Visibility.Collapsed;
-                targetPanel.Children.Clear();
-                return;
-            }
 
-            // Visa panel
-            targetPanel.Children.Clear();
-            targetPanel.Visibility = Visibility.Visible;
+        private void ButtonFood(object sender, RoutedEventArgs e)
+        {
+            ToggleCategoryPanel("Enkel mat", panelFood, "#FF6495ED"); // CornflowerBlue
+        }
 
-            var items = allProducts.Where(p => p.Category == category);
+        private void ButtonCandy(object sender, RoutedEventArgs e)
+        {
+            ToggleCategoryPanel("Godis", panelCandy, "#FF87CEEB"); // SkyBlue
+        }
 
-            foreach (var product in items)
-            {
-                Button b = new Button()
-                {
-                    Content = product.Name,
-                    Tag = product,
-                    Margin = new Thickness(0, 5, 0, 5),
-                    HorizontalAlignment = HorizontalAlignment.Stretch,
-                    Width = 170,
-                    Height = 60,
-                    Background = (Brush)new BrushConverter().ConvertFromString(colorHex),
-                    HorizontalContentAlignment = HorizontalAlignment.Center,
-                    VerticalContentAlignment = VerticalAlignment.Center,
-                    FontSize = 12
-                };
-                b.Click += ProductSelected;
-                targetPanel.Children.Add(b);
-            }
+        private void ButtonTobacco(object sender, RoutedEventArgs e)
+        {
+            ToggleCategoryPanel("Tobak", panelTobacco, "#FFADD8E6"); // LightBlue
+        }
+
+        private void ButtonPaper(object sender, RoutedEventArgs e)
+        {
+            ToggleCategoryPanel("Tidningar", panelPaper, "#FFB0C4DE"); // LightSteelBlue
         }
 
         private List<CartItem> cart = new List<CartItem>();
@@ -131,26 +134,6 @@ namespace Checkout
             }
 
             UpdateTotal();
-        }
-
-        private void ButtonFood(object sender, RoutedEventArgs e)
-        {
-            ToggleCategoryPanel("Food", panelFood, "#FF6495ED"); // CornflowerBlue
-        }
-
-        private void ButtonCandy(object sender, RoutedEventArgs e)
-        {
-            ToggleCategoryPanel("Candy", panelCandy, "#FF87CEEB"); // SkyBlue
-        }
-
-        private void ButtonTobacco(object sender, RoutedEventArgs e)
-        {
-            ToggleCategoryPanel("Tobacco", panelTobacco, "#FFADD8E6"); // LightBlue
-        }
-
-        private void ButtonPaper(object sender, RoutedEventArgs e)
-        {
-            ToggleCategoryPanel("Paper", panelPaper, "#FFB0C4DE"); // LightSteelBlue
         }
 
         private void ButtonClearCart(object sender, RoutedEventArgs e)
@@ -204,13 +187,13 @@ namespace Checkout
 
             var receipt = Receipt.ReceiptManager.AllReceipts[lstReceipts.SelectedIndex];
 
-            decimal moms = Math.Round(receipt.TotalPrice * 0.25m, 2);
-            decimal exklMoms = Math.Round(receipt.TotalPrice - moms, 2);
+            decimal taxRate = 0.25m;
+            decimal exklMoms = Math.Round(receipt.TotalPrice / (1 + taxRate), 2);
+            decimal moms = Math.Round(receipt.TotalPrice - exklMoms, 2);
 
             txtReceiptNumber.Text = $"Kvittonr: {receipt.ReceiptNumber}";
             txtReceiptTime.Text = $"Tid: {receipt.Timestamp}";
 
-            // Lägg till total + momsrad
             txtReceiptTotal.Text =
                 $"Exkl moms: {exklMoms} kr\n" +
                 $"Moms (25%): {moms} kr\n" +

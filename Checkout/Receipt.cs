@@ -69,9 +69,9 @@ namespace Checkout
             double headerLineHeight = 22;
             double lineGap = 30;
 
-            decimal taxRate = 0.25m; // 25% moms
-            decimal taxAmount = TotalPrice * taxRate;
-            decimal totalWithTax = TotalPrice;
+            decimal taxRate = 0.25m;
+            decimal exklMoms = Math.Round(TotalPrice / (1 + taxRate), 2);
+            decimal taxAmount = Math.Round(TotalPrice - exklMoms, 2);
 
             // --- Affärsinformation ---
             gfx.DrawString(StoreInfo.StoreName, headerFont, XBrushes.Black,
@@ -117,13 +117,13 @@ namespace Checkout
             yPoint += regularLineHeight;
 
             // --- TOTAL & Moms ---
-            gfx.DrawString($"TOTALT exkl. moms: {TotalPrice - taxAmount:F2} kr", headerFont, XBrushes.Black, 20, yPoint);
+            gfx.DrawString($"TOTALT exkl. moms: {exklMoms:F2} kr", headerFont, XBrushes.Black, 20, yPoint);
             yPoint += headerLineHeight;
 
             gfx.DrawString($"MOMS {taxRate * 100}%: {taxAmount:F2} kr", headerFont, XBrushes.Black, 20, yPoint);
             yPoint += headerLineHeight;
 
-            gfx.DrawString($"TOTALT inkl. moms: {totalWithTax:F2} kr", headerFont, XBrushes.Black, 20, yPoint);
+            gfx.DrawString($"TOTALT inkl. moms: {TotalPrice:F2} kr", headerFont, XBrushes.Black, 20, yPoint);
             yPoint += headerLineHeight;
 
             gfx.DrawString("Tack för ditt köp!", regularFont, XBrushes.Black, 20, yPoint);
