@@ -13,7 +13,6 @@ using Microsoft.Data.Sqlite;
 using static Checkout.Product;
 using static Checkout.Receipt;
 
-
 namespace Checkout
 {
 
@@ -27,13 +26,15 @@ namespace Checkout
         {
             InitializeComponent();
 
+            Database.EnsureCreated();
+
             allProducts = new List<Product>();
             foreach (var cat in ProductRepository.GetAllCategories())
             {
-                var prods = ProductRepository.GetProductsByCategory(cat);
-                allProducts.AddRange(prods);
+                allProducts.AddRange(ProductRepository.GetProductsByCategory(cat));
             }
 
+            LoadInventory();
         }
 
         private void ToggleCategoryPanel(string category, StackPanel targetPanel, string colorHex)
@@ -108,11 +109,28 @@ namespace Checkout
             Button button = sender as Button;
             Product product = button.Tag as Product;
 
-            // Kolla om produkten redan finns i kundvagnen
-            var existingItem = cart.FirstOrDefault(c => c.Product.Name == product.Name);
+            // Hämta aktuellt lager
+            var supply = ProductRepository.GetInventory()
+                .FirstOrDefault(p => p.Id == product.Id);
+
+            if (supply == null || supply.Inventory <= 0)
+            {
+                MessageBox.Show("Produkten är slut i lager!", "Slut i lager",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            var existingItem = cart.FirstOrDefault(c => c.Product.Id == product.Id);
 
             if (existingItem != null)
             {
+                if (existingItem.Quantity >= supply.Inventory)
+                {
+                    MessageBox.Show("Det finns inte fler i lager.", "Lagerbegränsning",
+                        MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
                 existingItem.Quantity++;
             }
             else
@@ -122,6 +140,7 @@ namespace Checkout
 
             UpdateCartDisplay();
         }
+
         private void UpdateCartDisplay()
         {
             lstProducts.Items.Clear();
@@ -158,22 +177,42 @@ namespace Checkout
                 return;
             }
 
+            // Försök sälja alla produkter
+            foreach (var item in cart)
+            {
+                bool ok = ProductRepository.TrySellProduct(
+                    item.Product.Id,
+                    item.Quantity);
+
+                if (!ok)
+                {
+                    MessageBox.Show(
+                        $"Inte tillräckligt lager för {item.Product.Name}",
+                        "Lagerfel",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Error);
+
+                    return;
+                }
+            }
+
             // Skapa kvitto
             var receipt = ReceiptManager.CreateReceipt(cart.ToList());
 
-            // Visa kvittot i listboxen
-            lstReceipts.Items.Add($"Kvittosnr: {receipt.ReceiptNumber}, Total: {receipt.TotalPrice} kr, Tid: {receipt.Timestamp}");
+            lstReceipts.Items.Add(
+                $"Kvittosnr: {receipt.ReceiptNumber}, Total: {receipt.TotalPrice} kr");
 
-            // Spara som PDF (exempelväg)
             string folder = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
             string filePath = Path.Combine(folder, $"Receipt_{receipt.ReceiptNumber}.pdf");
             receipt.SaveAsPdf(filePath);
 
-            // Töm kundvagn
             cart.Clear();
             lstProducts.Items.Clear();
             totalSum = 0;
             UpdateTotal();
+
+            // Uppdatera lager-tabben
+            LoadInventory();
         }
 
         private void UpdateTotal()
@@ -200,6 +239,10 @@ namespace Checkout
                 $"Total: {receipt.TotalPrice} kr";
 
             itemsReceiptPanel.ItemsSource = receipt.Items;
+        }
+        private void LoadInventory()
+        {
+            dgInventory.ItemsSource = ProductRepository.GetInventory();
         }
     }
 }

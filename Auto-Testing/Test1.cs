@@ -1,8 +1,11 @@
-﻿using FlaUI.Core.AutomationElements;
+﻿using Checkout;
+using FlaUI.Core.AutomationElements;
 using FlaUI.Core.Conditions;
 using FlaUI.Core.Input;
 using FlaUI.Core.Tools;
 using FlaUI.UIA3;
+using FlaUI.Core;
+using Microsoft.Data.Sqlite;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Diagnostics;
@@ -18,36 +21,36 @@ namespace CheckoutTests
                 "Checkout.exe"
             );
 
-        private static readonly string TestDbPath =
-    Path.Combine(
-        System.IO.Path.GetFullPath("../../../../Checkout/bin/Debug/net9.0-windows/"),
-        "TestDatabase.db"
-    );
+        private string TestDbPath = null!;
+
+        private FlaUI.Core.Application? _app;
 
         [TestInitialize]
         public void Setup()
         {
-            // Ta bort testdatabasen om den finns
-            if (File.Exists(TestDbPath))
-                File.Delete(TestDbPath);
-
-            // Kopiera originaldatabasen
-            string originalDb = Path.Combine(
-                Path.GetFullPath("../../../../Checkout/bin/Debug/net9.0-windows/"),
-                "Database.db"
+            TestDbPath = Path.Combine(
+                Path.GetDirectoryName(AppPath)!,
+                $"TestDatabase_{Guid.NewGuid()}.db"
             );
-            File.Copy(originalDb, TestDbPath);
 
-            // Låt ProductRepository använda testdatabasen
-            Checkout.ProductRepository.SetDatabasePath(TestDbPath);
+            ProductRepository.SetDatabasePath(TestDbPath);
+            Database.UseDatabase(TestDbPath);
+            Database.EnsureCreated();
+
+            StringAssert.Contains(
+                ProductRepository.CurrentDatabasePath,
+                "TestDatabase_",
+                "TESTS ARE RUNNING AGAINST PRODUCTION DATABASE!"
+            );
         }
+
 
         [TestMethod]
         public void Test_PayButton_EmptiesCart()
         {
-            var app = FlaUI.Core.Application.Launch(AppPath, TestDbPath);
+            _app = Application.Launch(AppPath, TestDbPath);
             using var automation = new UIA3Automation();
-            var window = app.GetMainWindow(automation);
+            var window = _app.GetMainWindow(automation);
             Assert.IsNotNull(window, "Main window was not found.");
 
             ConditionFactory cf = new ConditionFactory(new UIA3PropertyLibrary());
@@ -82,9 +85,9 @@ namespace CheckoutTests
         [TestMethod]
         public void Test_ClearButton_EmptiesCart()
         {
-            var app = FlaUI.Core.Application.Launch(AppPath, TestDbPath);
+            _app = Application.Launch(AppPath, TestDbPath);
             using var automation = new UIA3Automation();
-            var window = app.GetMainWindow(automation);
+            var window = _app.GetMainWindow(automation);
             Assert.IsNotNull(window);
 
             ConditionFactory cf = new ConditionFactory(new UIA3PropertyLibrary());
@@ -114,9 +117,9 @@ namespace CheckoutTests
         [TestMethod]
         public void Test_AllDropDownsOpenAndClose()
         {
-            var app = FlaUI.Core.Application.Launch(AppPath, TestDbPath);
+            _app = Application.Launch(AppPath, TestDbPath);
             using var automation = new UIA3Automation();
-            var window = app.GetMainWindow(automation);
+            var window = _app.GetMainWindow(automation);
             Assert.IsNotNull(window, "Main window was not found.");
 
             ConditionFactory cf = new ConditionFactory(new UIA3PropertyLibrary());
@@ -149,9 +152,9 @@ namespace CheckoutTests
         [TestMethod]
         public void Test_ProductButtons_AddToCart()
         {
-            var app = FlaUI.Core.Application.Launch(AppPath, TestDbPath);
+            _app = Application.Launch(AppPath, TestDbPath);
             using var automation = new UIA3Automation();
-            var window = app.GetMainWindow(automation);
+            var window = _app.GetMainWindow(automation);
             Assert.IsNotNull(window);
 
             ConditionFactory cf = new ConditionFactory(new UIA3PropertyLibrary());
@@ -194,9 +197,9 @@ namespace CheckoutTests
         [TestMethod]
         public void Test_ProductQuantity_IncrementsCorrectly()
         {
-            var app = FlaUI.Core.Application.Launch(AppPath, TestDbPath);
+            _app = Application.Launch(AppPath, TestDbPath);
             using var automation = new UIA3Automation();
-            var window = app.GetMainWindow(automation);
+            var window = _app.GetMainWindow(automation);
             Assert.IsNotNull(window);
 
             ConditionFactory cf = new ConditionFactory(new UIA3PropertyLibrary());
@@ -233,9 +236,9 @@ namespace CheckoutTests
         [TestMethod]
         public void Test_ReceiptAdded_AfterPayment()
         {
-            var app = FlaUI.Core.Application.Launch(AppPath, TestDbPath);
+            _app = Application.Launch(AppPath, TestDbPath);
             using var automation = new UIA3Automation();
-            var window = app.GetMainWindow(automation);
+            var window = _app.GetMainWindow(automation);
 
             ConditionFactory cf = new ConditionFactory(new UIA3PropertyLibrary());
 
@@ -264,9 +267,9 @@ namespace CheckoutTests
         [TestMethod]
         public void Test_ReceiptDetails_ShownOnSelect()
         {
-            var app = FlaUI.Core.Application.Launch(AppPath, TestDbPath);
+            _app = Application.Launch(AppPath, TestDbPath);
             using var automation = new UIA3Automation();
-            var window = app.GetMainWindow(automation);
+            var window = _app.GetMainWindow(automation);
             ConditionFactory cf = new ConditionFactory(new UIA3PropertyLibrary());
 
             // Lägg till produkt
@@ -304,9 +307,9 @@ namespace CheckoutTests
         [TestMethod]
         public void Test_ReceiptItems_ListedCorrectly()
         {
-            var app = FlaUI.Core.Application.Launch(AppPath, TestDbPath);
+            _app = Application.Launch(AppPath, TestDbPath);
             using var automation = new UIA3Automation();
-            var window = app.GetMainWindow(automation);
+            var window = _app.GetMainWindow(automation);
             ConditionFactory cf = new ConditionFactory(new UIA3PropertyLibrary());
 
             // Öppna och köp två produkter
@@ -332,9 +335,9 @@ namespace CheckoutTests
         [TestMethod]
         public void Test_ReceiptNumber_Increments()
         {
-            var app = FlaUI.Core.Application.Launch(AppPath, TestDbPath);
+            _app = Application.Launch(AppPath, TestDbPath);
             using var automation = new UIA3Automation();
-            var window = app.GetMainWindow(automation);
+            var window = _app.GetMainWindow(automation);
             ConditionFactory cf = new ConditionFactory(new UIA3PropertyLibrary());
 
             var foodButton = window.FindFirstDescendant(cf.ByAutomationId("btnFood")).AsButton();
@@ -356,6 +359,111 @@ namespace CheckoutTests
             Assert.IsTrue(receiptList.Items[1].Text.Contains("2"));
         }
 
-        
+        [TestMethod]
+        public void Test_Inventory_Decreases()
+        {
+            _app = Application.Launch(AppPath, TestDbPath);
+            using var automation = new UIA3Automation();
+            var window = _app.GetMainWindow(automation);
+
+            ConditionFactory cf = new ConditionFactory(new UIA3PropertyLibrary());
+
+            // Öppna mat
+            var foodButton = window.FindFirstDescendant(cf.ByAutomationId("btnFood")).AsButton();
+            foodButton.Click();
+
+            // Klicka produkt
+            var productButton = window.FindFirstDescendant(cf.ByName("Korv med bröd")).AsButton();
+            productButton.Click();
+
+            // Betala
+            var payButton = window.FindFirstDescendant(cf.ByAutomationId("btnPay")).AsButton();
+            payButton.Click();
+
+            // Gå till kvittotabben
+            var tab = window.FindFirstDescendant(cf.ByName("Lager")).AsTabItem();
+            tab.Select();
+
+            // Hitta kvittolista
+            // Hitta lagerrutnätet
+            var dgInventory = window.FindFirstDescendant(cf.ByAutomationId("dgInventory")).AsDataGridView();
+
+            // Hitta raden för produkten
+            var row = dgInventory.Rows
+                .FirstOrDefault(r => r.Cells[2].Value?.ToString() == "Korv med bröd");
+
+            Assert.IsNotNull(row, "Product not found in inventory grid.");
+
+            // Lager ska ha minskat från 100 → 99
+            int inventory = int.Parse(row.Cells[3].Value.ToString());
+            Assert.AreEqual(99, inventory, "Stock should decrease by 1 after purchase.");
+
+        }
+
+        [TestMethod]
+        public void Test_Sold_Increase()
+        {
+            _app = Application.Launch(AppPath, TestDbPath);
+            using var automation = new UIA3Automation();
+            var window = _app.GetMainWindow(automation);
+
+            ConditionFactory cf = new ConditionFactory(new UIA3PropertyLibrary());
+
+            // Öppna Godis
+            var candyButton = window.FindFirstDescendant(cf.ByAutomationId("btnCandy")).AsButton();
+            candyButton.Click();
+
+            // Vänta tills knappen syns
+            var productButton = Retry.WhileNull(
+                () => window.FindFirstDescendant(cf.ByName("Kexchoklad")),
+                timeout: TimeSpan.FromSeconds(2)
+            ).Result?.AsButton();
+
+            Assert.IsNotNull(productButton, "Kexchoklad button not found");
+            productButton.Click();
+
+            // Betala
+            var payButton = window.FindFirstDescendant(cf.ByAutomationId("btnPay")).AsButton();
+            payButton.Click();
+
+            // Gå till Lager
+            var tab = window.FindFirstDescendant(cf.ByName("Lager")).AsTabItem();
+            tab.Select();
+
+            // Hitta lagerrutnätet
+            var dgInventory = window.FindFirstDescendant(cf.ByAutomationId("dgSold")).AsDataGridView();
+
+            // Hitta raden för Kexchoklad
+            var row = dgInventory.Rows.FirstOrDefault(r => r.Cells[2].Value?.ToString() == "Kexchoklad");
+            Assert.IsNotNull(row, "Kexchoklad not found in inventory grid.");
+
+            // Kontrollera sold
+            int sold = int.Parse(row.Cells[4].Value.ToString());
+            Assert.AreEqual(1, sold, "Sold should increase by 1 after purchase.");
+        }
+
+
+        [TestCleanup]
+        public void Cleanup()
+        {
+            if (_app != null && !_app.HasExited)
+            {
+                _app.Close();
+                _app.Dispose();
+                _app = null;
+            }
+
+            foreach (var p in Process.GetProcessesByName("Checkout"))
+            {
+                p.Kill();
+            }
+
+            if (File.Exists(TestDbPath))
+            {
+                try { File.Delete(TestDbPath); }
+                catch { /* ignorera – Windows kan vara seg */ }
+            }
+        }
+
     }
 }

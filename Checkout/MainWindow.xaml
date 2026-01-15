@@ -143,19 +143,31 @@
 
                                                 <!-- Pris + kr -->
                                                 <TextBlock Text="{Binding TotalPrice, StringFormat='{}{0} kr'}" Grid.Column="2" HorizontalAlignment="Right"/>
-                                                
+
                                             </Grid>
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
-
-
                                 <Separator Margin="0 10 0 10"/>
-
                                 <TextBlock x:Name="txtReceiptTotal" FontWeight="Bold" FontSize="20"/>
                             </StackPanel>
                         </ScrollViewer>
                     </Border>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Lager">
+                <Grid Margin="10">
+                    <DataGrid x:Name="dgInventory" AutoGenerateColumns="False" CanUserAddRows="False" 
+                              IsReadOnly="True" HeadersVisibility="Column" GridLinesVisibility="All" FontSize="16">
+
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="60"/>
+                            <DataGridTextColumn Header="Category" Binding="{Binding Category}" Width="*"/>
+                            <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="2*"/>
+                            <DataGridTextColumn Header="Stock" Binding="{Binding Inventory}" Width="80"/>
+                            <DataGridTextColumn Header="Sold" Binding="{Binding Sold}" Width="80"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
                 </Grid>
             </TabItem>
         </TabControl>
